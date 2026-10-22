@@ -1,8 +1,13 @@
-FROM php:8.0.14-fpm-alpine
+FROM ghcr.io/mpyw/php-eol-cve-2026-109618-109619:8.0-fpm-alpine
 
-RUN echo "http://dl-cdn.alpinelinux.org/alpine/latest-stable/main" >> /etc/apk/repositories
+# Keep packages aligned with the base image (Alpine 3.16).
+RUN printf '%s\n' \
+    'https://dl-cdn.alpinelinux.org/alpine/v3.16/main' \
+    'https://dl-cdn.alpinelinux.org/alpine/v3.16/community' \
+    > /etc/apk/repositories
+
 ARG APK_COMMON_DEPENDENCIES="bash busybox-suid curl dcron git libcap mysql-client unzip zip"
-RUN apk add --update --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/latest-stable/main $APK_COMMON_DEPENDENCIES
+RUN apk add --no-cache $APK_COMMON_DEPENDENCIES
 
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/
 ARG PHP_EXTENSIONS="bcmath exif gd gmp imagick intl maxminddb opcache pcntl pdo_mysql sockets zip"
